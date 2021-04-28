@@ -68,6 +68,10 @@ public class FormaPagamento implements Serializable, IDadosAlteracao {
 	private List<Saida> saidas;
 	
 	public FormaPagamento(Long id) {this.id = id;}
+	public FormaPagamento(Long id, String nome) {
+		this.id = id;
+		this.nome = nome;
+	}
 	
 	@PrePersist
 	@Override

@@ -3,6 +3,7 @@ package br.com.suleimanmoraes.igrejanewservice.api.service.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,16 @@ public class EstadoServiceImpl implements EstadoService {
 		erros = ValidacaoComumUtil.validarString(objeto.getUf(), "UF", 'a', erros, 2);
 		if (!CollectionUtils.isEmpty(erros)) {
 			throw new NegocioException(erros);
+		}
+	}
+
+	@Override
+	public List<Estado> findAll() {
+		try {
+			return repository.findByOrderByNomeAsc();
+		} catch (Exception e) {
+			logger.warn("findAll " + ExceptionUtils.getRootCauseMessage(e));
+			return null;
 		}
 	}
 }

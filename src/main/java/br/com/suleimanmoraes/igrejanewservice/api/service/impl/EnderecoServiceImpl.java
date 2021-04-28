@@ -43,6 +43,7 @@ public class EnderecoServiceImpl implements EnderecoService {
 	public List<String> validar(EnderecoDto objeto, List<String> erros) throws Exception {
 		if (objeto != null) {
 			erros = ValidacaoComumUtil.validarString(objeto.getCep(), "Cep", 'o', erros, 8);
+			erros = ValidacaoComumUtil.validarString(objeto.getBairro(), "Bairro", 'o', erros, 100);
 			erros = ValidacaoComumUtil.validarString(objeto.getRua(), "Rua", 'a', erros, 100);
 			erros = ValidacaoComumUtil.validarString(objeto.getCidade(), "Cidade", 'a', erros, 100);
 			erros = ValidacaoComumUtil.validarObjectAndId(objeto.getEstado(), "Estado", 'o', erros);

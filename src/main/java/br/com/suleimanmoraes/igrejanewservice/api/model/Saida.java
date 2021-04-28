@@ -55,12 +55,10 @@ public class Saida implements Serializable, IDadosAlteracao {
 	@Column(name = "id_usuario_alteracao")
 	private Long idUsuarioAlteracao;
 	
-	private Date data;
+	@Column(name = "data_saida")
+	private Date dataSaida;
 	
 	private Double valor;
-	
-	@Column(name = "valor_mensal")
-	private Double valorMensal;
 
 	private String nome;
 

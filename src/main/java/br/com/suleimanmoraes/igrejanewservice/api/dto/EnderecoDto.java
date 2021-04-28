@@ -26,6 +26,8 @@ public class EnderecoDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private Long id;
+	
+	private String bairro;
 
 	private String numero;
 
@@ -54,6 +56,7 @@ public class EnderecoDto implements Serializable {
 		this.complemento = objeto.getComplemento();
 		this.cep = objeto.getCep();
 		this.rua = objeto.getRua();
+		this.bairro = objeto.getBairro();
 		this.cidade = objeto.getCidade();
 		this.estado = objeto.getEstado();
 	}

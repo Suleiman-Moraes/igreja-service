@@ -3,12 +3,14 @@ package br.com.suleimanmoraes.igrejanewservice.api.service.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
 import br.com.suleimanmoraes.igrejanewservice.api.exception.NegocioException;
 import br.com.suleimanmoraes.igrejanewservice.api.model.FormaPagamento;
 import br.com.suleimanmoraes.igrejanewservice.api.repository.FormaPagamentoRepository;
@@ -46,6 +48,16 @@ public class FormaPagamentoServiceImpl implements FormaPagamentoService {
 		erros = ValidacaoComumUtil.validarString(objeto.getDescricao(), "Descrição", erros, 300);
 		if (!CollectionUtils.isEmpty(erros)) {
 			throw new NegocioException(erros);
+		}
+	}
+	
+	@Override
+	public List<FormaPagamento> findAll() {
+		try {
+			return repository.findByAtivoOrderByNomeAsc(AtivoInativoEnum.ATIVO);
+		} catch (Exception e) {
+			logger.warn("findAll " + ExceptionUtils.getRootCauseMessage(e));
+			return null;
 		}
 	}
 }

@@ -57,6 +57,8 @@ public class Endereco implements Serializable, IDadosAlteracao {
 	@Column(name = "id_usuario_alteracao")
 	private Long idUsuarioAlteracao;
 
+	private String bairro;
+	
 	private String numero;
 
 	private String quadra;
@@ -90,6 +92,7 @@ public class Endereco implements Serializable, IDadosAlteracao {
 		this.complemento = objeto.getComplemento();
 		this.cep = objeto.getCep();
 		this.rua = objeto.getRua();
+		this.bairro = objeto.getBairro();
 		this.cidade = objeto.getCidade();
 		this.estado = objeto.getEstado();
 	}
@@ -105,6 +108,7 @@ public class Endereco implements Serializable, IDadosAlteracao {
 		this.complemento = objeto.getComplemento();
 		this.cep = objeto.getCep();
 		this.rua = objeto.getRua();
+		this.bairro = objeto.getBairro();
 		this.cidade = objeto.getCidade();
 		this.estado = objeto.getEstado();
 		this.pessoas = objeto.getPessoas();
