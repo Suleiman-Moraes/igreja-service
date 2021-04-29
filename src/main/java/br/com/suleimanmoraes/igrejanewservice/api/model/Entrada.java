@@ -2,7 +2,6 @@ package br.com.suleimanmoraes.igrejanewservice.api.model;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
@@ -13,19 +12,14 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import br.com.suleimanmoraes.igrejanewservice.api.converter.AtivoInativoEnumConverter;
-import br.com.suleimanmoraes.igrejanewservice.api.dto.PessoaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
 import br.com.suleimanmoraes.igrejanewservice.api.interfaces.IDadosAlteracao;
 import lombok.Data;
@@ -40,8 +34,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "pessoa")
-public class Pessoa implements Serializable, IDadosAlteracao {
+@Table(name = "entrada")
+public class Entrada implements Serializable, IDadosAlteracao {
 
 	private static final long serialVersionUID = 1L;
 
@@ -60,69 +54,35 @@ public class Pessoa implements Serializable, IDadosAlteracao {
 
 	@Column(name = "id_usuario_alteracao")
 	private Long idUsuarioAlteracao;
+	
+	@Column(name = "data_entrada")
+	private Date dataEntrada;
+	
+	private Double valor;
 
 	private String nome;
 
-	private String telefone;
-
-	private String email;
-
-	private String cpf;
-
-	private String cidade;
-
-	private Date nascimento;
+	private String descricao;
 
 	@Convert(converter = AtivoInativoEnumConverter.class)
 	private AtivoInativoEnum ativo;
-
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_estado")
-	private Estado estado;
-
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_tipo_entrada")
+	private TipoEntrada tipoEntrada;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_pessoa")
+	private Pessoa pessoa;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_igreja")
 	private Igreja igreja;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_cargo")
-	private Cargo cargo;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_endereco")
-	private Endereco endereco;
-
-	@JsonIgnoreProperties(value = { "pessoa", "permissoes" })
-	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_usuario", referencedColumnName = "id")
-	private Usuario usuario;
 	
-	@JsonIgnore
-	@OneToMany(mappedBy = "pessoa", fetch = FetchType.LAZY)
-	private List<Entrada> entradas;
-
-	public Pessoa(long id) {
-		this.id = id;
-	}
-
-	public Pessoa(String nome, Igreja igreja, Cargo cargo) {
-		this.nome = nome;
-		this.igreja = igreja;
-		this.cargo = cargo;
-	}
-
-	public void setPessoa(PessoaDto objeto) {
-		this.nome = objeto.getNome();
-		this.telefone = objeto.getTelefone();
-		this.email = objeto.getEmail();
-		this.cpf = objeto.getCpf();
-		this.cidade = objeto.getCidade();
-		this.nascimento = objeto.getNascimento();
-		this.estado = objeto.getEstado();
-		this.igreja = objeto.getIgreja() != null ? new Igreja(objeto.getIgreja().getId()) : null;
-		this.cargo = objeto.getCargo() != null ? new Cargo(objeto.getCargo().getId()) : null;
-	}
-
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "id_forma_pagamento")
+	private FormaPagamento formaPagamento;
+	
 	@PrePersist
 	@Override
 	public void prePersist() {
@@ -135,7 +95,6 @@ public class Pessoa implements Serializable, IDadosAlteracao {
 	public void preUpdate() {
 		prePersistAndUpdate();
 	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -144,7 +103,7 @@ public class Pessoa implements Serializable, IDadosAlteracao {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Pessoa other = (Pessoa) obj;
+		Entrada other = (Entrada) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -152,7 +111,6 @@ public class Pessoa implements Serializable, IDadosAlteracao {
 			return false;
 		return true;
 	}
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;

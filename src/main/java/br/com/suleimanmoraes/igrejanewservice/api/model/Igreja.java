@@ -61,6 +61,10 @@ public class Igreja implements Serializable {
 	@OneToMany(mappedBy = "igreja", fetch = FetchType.LAZY)
 	private List<Saida> saidas;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "igreja", fetch = FetchType.LAZY)
+	private List<Entrada> entradas;
+	
 	public Igreja(Long id) {
 		this.id = id;
 	}

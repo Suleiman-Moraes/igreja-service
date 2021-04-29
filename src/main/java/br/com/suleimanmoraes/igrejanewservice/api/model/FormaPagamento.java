@@ -67,6 +67,10 @@ public class FormaPagamento implements Serializable, IDadosAlteracao {
 	@OneToMany(mappedBy = "formaPagamento", fetch = FetchType.LAZY)
 	private List<Saida> saidas;
 	
+	@JsonIgnore
+	@OneToMany(mappedBy = "formaPagamento", fetch = FetchType.LAZY)
+	private List<Entrada> entradas;
+	
 	public FormaPagamento(Long id) {this.id = id;}
 	public FormaPagamento(Long id, String nome) {
 		this.id = id;

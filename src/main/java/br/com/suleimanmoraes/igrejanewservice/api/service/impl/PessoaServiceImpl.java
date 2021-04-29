@@ -91,7 +91,7 @@ public class PessoaServiceImpl implements PessoaService {
 
 	@Override
 	public void preSave(Pessoa objeto) {
-		if(objeto.getEstado() == null || objeto.getEstado().getId() == null) {
+		if (objeto.getEstado() == null || objeto.getEstado().getId() == null) {
 			objeto.setEstado(null);
 		}
 		saveUsuarioAlteracaoAndCadastro(objeto, usuarioService);
@@ -179,7 +179,7 @@ public class PessoaServiceImpl implements PessoaService {
 			Long cargoId = 2l;
 			Long igrejaId = null;
 			Pessoa pessoa = new Pessoa();
-			if(objeto.getEstado() == null || objeto.getEstado().getId() == null) {
+			if (objeto.getEstado() == null || objeto.getEstado().getId() == null) {
 				objeto.setEstado(null);
 			}
 			if (objeto.getId() != null) {
@@ -225,6 +225,13 @@ public class PessoaServiceImpl implements PessoaService {
 		erros = ValidacaoComumUtil.validarString(objeto.getCpf(), "CPF", erros, 11);
 		erros = ValidacaoComumUtil.validarString(objeto.getTelefone(), "Telefone", erros, 11);
 		erros = usuarioService.validar(objeto.getUsuario(), erros);
+		Long id = 0l;
+		if (objeto.getId() != null) {
+			id = objeto.getId();
+		}
+		if (objeto.getCpf() != null && repository.existsByCpfAndIdNot(objeto.getCpf(), id)) {
+			erros.add("CPF em uso, consulte o administrador.");
+		}
 		if (objeto.getEndereco() != null && objeto.getEndereco().isEnderecoInformado()) {
 			erros = enderecoService.validar(objeto.getEndereco(), erros);
 		}

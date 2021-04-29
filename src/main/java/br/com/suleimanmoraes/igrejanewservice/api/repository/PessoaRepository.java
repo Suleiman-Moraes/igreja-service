@@ -11,4 +11,6 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long>{
 	boolean existsByIdAndIgrejaId(Long id, Long igrejaId);
 
 	Pessoa findTopByUsuarioId(Long usuarioId);
+
+	boolean existsByCpfAndIdNot(String cpf, Long id);
 }
