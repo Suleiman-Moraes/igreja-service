@@ -32,4 +32,6 @@ public interface UsuarioService extends IUsuarioService, CrudPadraoService<Usuar
 	Usuario tratarUsuarioLsDtoPreSave(UsuarioLsDto usuarioLsDto, Long pessoaId, Long igrejaId, Long cargoId);
 
 	UsuarioLogadoDto findUsuarioLogadoDtoBy();
+
+	Boolean reset(Long pessoaId);
 }

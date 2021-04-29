@@ -47,7 +47,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-	
+
 	private Long findIdTopByPessoaIdAndIdNot(Long pessoaId, Long id) {
 		try {
 			pessoaId = pessoaId == null ? 0l : pessoaId;
@@ -115,6 +115,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public void atualizarPermissoesPorCargo(Cargo cargo) {
 		try {
@@ -230,7 +231,7 @@ public class UsuarioServiceImpl implements UsuarioService {
 		}
 		return usuario;
 	}
-	
+
 	@Override
 	public UsuarioLogadoDto findUsuarioLogadoDtoBy() {
 		try {
@@ -239,6 +240,20 @@ public class UsuarioServiceImpl implements UsuarioService {
 		} catch (Exception e) {
 			logger.warn("findUsuarioLogadoDtoBy " + ExceptionUtils.getRootCauseMessage(e));
 			return null;
+		}
+	}
+
+	@Override
+	public Boolean reset(Long pessoaId) {
+		try {
+			Usuario usuario = findByPessoaId(pessoaId);
+			usuario.setSenha(
+					usuario.getLogin().length() > 29 ? usuario.getLogin().substring(0, 29) : usuario.getLogin());
+			save(usuario);
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			logger.warn("reset " + ExceptionUtils.getRootCauseMessage(e));
+			throw new NegocioException(e);
 		}
 	}
 }

@@ -3,6 +3,7 @@ package br.com.suleimanmoraes.igrejanewservice.api.service.impl;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import br.com.suleimanmoraes.igrejanewservice.api.dto.SaidaInformacaoDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterSaidaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.listagem.SaidaListagemDto;
 import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
@@ -96,7 +98,7 @@ public class SaidaServiceImpl implements SaidaService {
 			save(objeto);
 			return Boolean.TRUE;
 		} catch (Exception e) {
-			logger.warn("ativar " + e.getMessage());
+			logger.warn("ativar " + ExceptionUtils.getRootCauseMessage(e));
 			throw e;
 		}
 	}
@@ -109,7 +111,7 @@ public class SaidaServiceImpl implements SaidaService {
 			save(objeto);
 			return Boolean.TRUE;
 		} catch (Exception e) {
-			logger.warn("deleteById " + e.getMessage());
+			logger.warn("deleteById " + ExceptionUtils.getRootCauseMessage(e));
 			throw e;
 		}
 	}
@@ -125,8 +127,24 @@ public class SaidaServiceImpl implements SaidaService {
 			final Integer total = dao.countByFilter(filter);
 			return new PageImpl<>(lista, pageable, total);
 		} catch (Exception e) {
-			logger.warn("findByFilter " + e.getMessage());
+			logger.warn("findByParams " + ExceptionUtils.getRootCauseMessage(e));
 		}
 		return new PageImpl<>(new LinkedList<>(), pageable, 0);
+	}
+	
+	@Override
+	public SaidaInformacaoDto getInformacao(FilterSaidaDto filter) {
+		try {
+			if (!RolesUtil.isRoot()) {
+				filter.setIgrejaId(igrejaService.findByToken().getId());
+			}
+			filter.setAtivo(AtivoInativoEnum.ATIVO);
+			SaidaInformacaoDto info = dao.getInformacao(filter);
+			info.setFiltro(filter);
+			return info;
+		} catch (Exception e) {
+			logger.warn("getInformacao " + ExceptionUtils.getRootCauseMessage(e));
+		}
+		return new SaidaInformacaoDto();
 	}
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.suleimanmoraes.igrejanewservice.api.dto.SaidaInformacaoDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterSaidaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.listagem.SaidaListagemDto;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Saida;
@@ -44,8 +45,9 @@ public class SaidaController {
 
 	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
 	@PostMapping(value = "/params")
-	public ResponseEntity<Page<SaidaListagemDto>> findByParams(HttpServletRequest request, @RequestBody FilterSaidaDto filter) {
-		Page<SaidaListagemDto> pagina = service.findByParams(filter);
+	public ResponseEntity<Page<SaidaListagemDto>> findByParams(HttpServletRequest request,
+			@RequestBody FilterSaidaDto filter) {
+		final Page<SaidaListagemDto> pagina = service.findByParams(filter);
 		return ResponseEntity.ok(pagina);
 	}
 
@@ -54,10 +56,11 @@ public class SaidaController {
 	public ResponseEntity<Saida> findById(HttpServletRequest request, @PathVariable("id") long id) {
 		return RestControllerUtil.findByIdCompleto(getService(), id);
 	}
-	
+
 	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
 	@DeleteMapping(value = "{id}")
-	public ResponseEntity<Boolean> deleteById(HttpServletRequest request, @PathVariable("id") long id) throws Exception {
+	public ResponseEntity<Boolean> deleteById(HttpServletRequest request, @PathVariable("id") long id)
+			throws Exception {
 		return RestControllerUtil.deleteByIdCompleto(getService(), id);
 	}
 
@@ -65,6 +68,14 @@ public class SaidaController {
 	@PutMapping(value = "/ativar/{id}")
 	public ResponseEntity<Boolean> ativar(HttpServletRequest request, @PathVariable("id") long id) throws Exception {
 		Boolean retorno = service.ativar(id);
+		return ResponseEntity.ok(retorno);
+	}
+
+	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
+	@PostMapping(value = "/info")
+	public ResponseEntity<SaidaInformacaoDto> getInformacao(HttpServletRequest request,
+			@RequestBody FilterSaidaDto filter) {
+		SaidaInformacaoDto retorno = service.getInformacao(filter);
 		return ResponseEntity.ok(retorno);
 	}
 }

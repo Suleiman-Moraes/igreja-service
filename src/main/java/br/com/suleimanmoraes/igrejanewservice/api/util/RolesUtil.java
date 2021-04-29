@@ -11,6 +11,7 @@ public class RolesUtil {
 	public static final String ROLE_ROOT = "ROLE_ROOT";
 	public static final String ROLE_TESOUREIRO = "ROLE_TESOUREIRO";
 	public static final String ROLE_ADMIN = "ROLE_ADMIN";
+	public static final String ROLE_PESSOA = "ROLE_PESSOA";
 	
 	public static Boolean temPermissao(String ...roles) {
 		try {

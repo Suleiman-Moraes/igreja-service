@@ -7,6 +7,10 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -14,6 +18,9 @@ import org.springframework.util.StringUtils;
 
 import br.com.suleimanmoraes.igrejanewservice.api.dto.ObjetoComIdDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.PessoaDto;
+import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterPessoaDto;
+import br.com.suleimanmoraes.igrejanewservice.api.dto.listagem.PessoaListagemDto;
+import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
 import br.com.suleimanmoraes.igrejanewservice.api.exception.NaoAutorizadoException;
 import br.com.suleimanmoraes.igrejanewservice.api.exception.NegocioException;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Cargo;
@@ -21,6 +28,7 @@ import br.com.suleimanmoraes.igrejanewservice.api.model.Igreja;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Pessoa;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Usuario;
 import br.com.suleimanmoraes.igrejanewservice.api.repository.PessoaRepository;
+import br.com.suleimanmoraes.igrejanewservice.api.repository.dao.PessoaDao;
 import br.com.suleimanmoraes.igrejanewservice.api.service.EnderecoService;
 import br.com.suleimanmoraes.igrejanewservice.api.service.IgrejaService;
 import br.com.suleimanmoraes.igrejanewservice.api.service.PessoaService;
@@ -37,6 +45,9 @@ public class PessoaServiceImpl implements PessoaService {
 	@Getter
 	@Autowired
 	private PessoaRepository repository;
+
+	@Autowired
+	private PessoaDao dao;
 
 	@Autowired
 	private UsuarioService usuarioService;
@@ -80,6 +91,9 @@ public class PessoaServiceImpl implements PessoaService {
 
 	@Override
 	public void preSave(Pessoa objeto) {
+		if(objeto.getEstado() == null || objeto.getEstado().getId() == null) {
+			objeto.setEstado(null);
+		}
 		saveUsuarioAlteracaoAndCadastro(objeto, usuarioService);
 	}
 
@@ -165,6 +179,9 @@ public class PessoaServiceImpl implements PessoaService {
 			Long cargoId = 2l;
 			Long igrejaId = null;
 			Pessoa pessoa = new Pessoa();
+			if(objeto.getEstado() == null || objeto.getEstado().getId() == null) {
+				objeto.setEstado(null);
+			}
 			if (objeto.getId() != null) {
 				final Pessoa p = findById(objeto.getId());
 				if (p != null) {
@@ -233,6 +250,52 @@ public class PessoaServiceImpl implements PessoaService {
 		} catch (Exception e) {
 			logger.warn("findDtoById " + ExceptionUtils.getRootCauseMessage(e));
 			return null;
+		}
+	}
+
+	@Override
+	public Page<PessoaListagemDto> findByParams(FilterPessoaDto filter) {
+		final Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
+		try {
+			if (!RolesUtil.isRoot()) {
+				filter.setIgrejaId(igrejaService.findByToken().getId());
+			}
+			final List<PessoaListagemDto> lista = dao.findByFilter(filter);
+			final Integer total = dao.countByFilter(filter);
+			return new PageImpl<>(lista, pageable, total);
+		} catch (Exception e) {
+			logger.warn("findByParams " + ExceptionUtils.getRootCauseMessage(e));
+		}
+		return new PageImpl<>(new LinkedList<>(), pageable, 0);
+	}
+
+	@Override
+	public Boolean ativar(Long id) throws Exception {
+		try {
+			Pessoa objeto = findById(id);
+			objeto.setAtivo(AtivoInativoEnum.ATIVO);
+			objeto.getUsuario().setAtivo(AtivoInativoEnum.ATIVO);
+			usuarioService.save(objeto.getUsuario());
+			save(objeto);
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			logger.warn("ativar " + ExceptionUtils.getRootCauseMessage(e));
+			throw e;
+		}
+	}
+
+	@Override
+	public Boolean deleteById(Long id) throws Exception {
+		try {
+			Pessoa objeto = findById(id);
+			objeto.setAtivo(AtivoInativoEnum.INATIVO);
+			objeto.getUsuario().setAtivo(AtivoInativoEnum.INATIVO);
+			usuarioService.save(objeto.getUsuario());
+			save(objeto);
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			logger.warn("deleteById " + ExceptionUtils.getRootCauseMessage(e));
+			throw e;
 		}
 	}
 }

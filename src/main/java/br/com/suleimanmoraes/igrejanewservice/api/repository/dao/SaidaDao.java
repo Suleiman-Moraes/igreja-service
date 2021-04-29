@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
 
+import br.com.suleimanmoraes.igrejanewservice.api.dto.SaidaInformacaoDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterSaidaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.listagem.SaidaListagemDto;
 
@@ -48,6 +49,21 @@ public class SaidaDao {
 		return null;
 	}
 
+	public SaidaInformacaoDto getInformacao(FilterSaidaDto filtro) {
+		try {
+			StringBuilder sql = new StringBuilder("SELECT");
+			sql.append(" COUNT(saida.id) AS totalRegistros,");
+			sql.append(" SUM(saida.valor) AS valorTotal,");
+			sql.append(" AVG(saida.valor) AS media");
+			sql.append(" ");
+			return (SaidaInformacaoDto) getQueryByFilter(filtro, sql.toString(), "",
+					SaidaInformacaoDto.SAIDA_INFORMACAO_DTO_MAPPING).getSingleResult();
+		} catch (Exception e) {
+			logger.warn("findByFilter " + e.getMessage());
+		}
+		return new SaidaInformacaoDto();
+	}
+
 	public Integer countByFilter(FilterSaidaDto filtro) {
 		try {
 			return Integer.valueOf(getQueryByFilter(filtro, "SELECT COUNT(DISTINCT(saida.id)) ", "", null)
@@ -77,7 +93,7 @@ public class SaidaDao {
 				tudo.append(" AND saida.ativo = :ativo");
 				mapa.put("ativo", filtro.getAtivo().getValue());
 			}
-			if(filtro.getMesAno() != null) {
+			if (filtro.getMesAno() != null) {
 				final String mesAno = DateFormatUtils.format(filtro.getMesAno(), "yyyy-MM") + "%";
 				tudo.append(" AND CONCAT(saida.data_saida, '') LIKE :mesAno");
 				mapa.put("mesAno", mesAno);
