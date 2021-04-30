@@ -30,7 +30,7 @@ public class EntradaDao {
 	private static final String SQL_CONSULTA_FILTRO_FROM = "FROM entrada entrada"
 			+ SQL_CONSULTA_FILTRO_JOIN_FORMAPAGAMENTO + SQL_CONSULTA_FILTRO_JOIN_PESSOA
 			+ SQL_CONSULTA_FILTRO_JOIN_TIPOENTRADA;
-	private static final String SQL_CONSULTA_FILTRO_GROUP = "GROUP BY entrada.id, formaPagamento.nome ORDER BY entrada.id DESC";
+	private static final String SQL_CONSULTA_FILTRO_GROUP = "GROUP BY entrada.id, formaPagamento.nome, tipoEntrada.id, pessoa.id ORDER BY entrada.id DESC";
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -58,7 +58,7 @@ public class EntradaDao {
 		}
 		return null;
 	}
-	
+
 	public EntradaInformacaoDto getInformacao(FilterEntradaDto filtro) {
 		try {
 			StringBuilder sql = new StringBuilder("SELECT");
@@ -78,14 +78,15 @@ public class EntradaDao {
 	public List<EntradaTipoEntradaInformacaoDto> getTipoEntradaInformacoes(FilterEntradaDto filtro) {
 		try {
 			StringBuilder sql = new StringBuilder("SELECT");
-			sql.append(" COUNT(entrada.id) AS totalRegistros,");
+			sql.append(" COUNT(entrada.id_tipo_entrada) AS totalRegistros,");
 			sql.append(" SUM(entrada.valor) AS valorTotal,");
 			sql.append(" AVG(entrada.valor) AS media,");
-			sql.append(" AVG(tipoEntrada.id) AS tipoEntradaId,");
-			sql.append(" AVG(tipoEntrada.nome) AS tipoEntradaNome");
+			sql.append(" entrada.id_tipo_entrada AS tipoEntradaId,");
+			sql.append(" tipoEntrada.nome AS tipoEntradaNome");
 			sql.append(" ");
-			return getQueryByFilter(filtro, sql.toString(), "GROUP BY tipoEntrada.id ORDER BY tipoEntrada.nome",
-					EntradaInformacaoDto.ENTRADA_INFORMACAO_DTO_MAPPING).getResultList();
+			return getQueryByFilter(filtro, sql.toString(),
+					"GROUP BY entrada.id_tipo_entrada, tipoEntrada.nome ORDER BY tipoEntrada.nome",
+					EntradaTipoEntradaInformacaoDto.ENTRADA_TIPO_ENTRADA_INFORMACAO_DTO_MAPPING).getResultList();
 		} catch (Exception e) {
 			logger.warn("findByFilter " + e.getMessage());
 		}

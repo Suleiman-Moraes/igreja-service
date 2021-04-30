@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import br.com.suleimanmoraes.igrejanewservice.api.dto.EntradaInformacaoDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterEntradaDto;
@@ -29,6 +30,7 @@ import br.com.suleimanmoraes.igrejanewservice.api.repository.EntradaRepository;
 import br.com.suleimanmoraes.igrejanewservice.api.repository.dao.EntradaDao;
 import br.com.suleimanmoraes.igrejanewservice.api.service.EntradaService;
 import br.com.suleimanmoraes.igrejanewservice.api.service.IgrejaService;
+import br.com.suleimanmoraes.igrejanewservice.api.service.PessoaService;
 import br.com.suleimanmoraes.igrejanewservice.api.service.UsuarioService;
 import br.com.suleimanmoraes.igrejanewservice.api.util.RolesUtil;
 import br.com.suleimanmoraes.igrejanewservice.api.util.ValidacaoComumUtil;
@@ -48,6 +50,9 @@ public class EntradaServiceImpl implements EntradaService {
 
 	@Autowired
 	private UsuarioService usuarioService;
+	
+	@Autowired
+	private PessoaService pessoaService;
 
 	@Autowired
 	private IgrejaService igrejaService;
@@ -64,8 +69,12 @@ public class EntradaServiceImpl implements EntradaService {
 		if (objeto.getTipoEntrada() == null || objeto.getTipoEntrada().getId() == null) {
 			objeto.setTipoEntrada(null);
 		}
-		if (objeto.getPessoa() == null || objeto.getPessoa().getId() == null) {
-			objeto.setPessoa(null);
+		if (objeto.getPessoa() != null) {
+			if (StringUtils.hasText(objeto.getPessoa().getNome())) {
+				objeto.setPessoa(pessoaService.saveNew(objeto.getPessoa().getNome()));
+			} else if (objeto.getPessoa().getId() == null) {
+				objeto.setPessoa(null);
+			}
 		}
 	}
 
@@ -75,12 +84,13 @@ public class EntradaServiceImpl implements EntradaService {
 	}
 
 	@Override
-	public void validar(Entrada objeto) throws NegocioException {
+	public void validar(Entrada objeto) throws Exception {
 		List<String> erros = new LinkedList<>();
 		erros = ValidacaoComumUtil.validarString(objeto.getNome(), "Nome", 'o', erros, 100);
 		erros = ValidacaoComumUtil.validarString(objeto.getDescricao(), "Descrição", erros, 300);
 		erros = ValidacaoComumUtil.validarNotNull(objeto.getDataEntrada(), "Data", 'a', erros);
 		erros = ValidacaoComumUtil.validarNotNullAndMaiorZero(objeto.getValor(), "Valor", 'o', erros);
+		erros = ValidacaoComumUtil.validarObjectAndId(objeto.getTipoEntrada(), "Tipo da Entrada", 'o', erros);
 		if (!CollectionUtils.isEmpty(erros)) {
 			throw new NegocioException(erros);
 		}
@@ -153,7 +163,7 @@ public class EntradaServiceImpl implements EntradaService {
 			filter.setTipoEntradaId(null);
 			EntradaInformacaoDto info = dao.getInformacao(filter);
 			info.setFiltro(filter);
-			if(info.getTotalRegistros() > 0) {
+			if (info.getTotalRegistros() > 0) {
 				info.setTipoEntradaInfomacoes(dao.getTipoEntradaInformacoes(filter));
 			}
 			return info;

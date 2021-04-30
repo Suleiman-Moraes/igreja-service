@@ -101,10 +101,13 @@ public class Pessoa implements Serializable, IDadosAlteracao {
 	@OneToMany(mappedBy = "pessoa", fetch = FetchType.LAZY)
 	private List<Entrada> entradas;
 
-	public Pessoa(long id) {
+	public Pessoa(Long id) {
 		this.id = id;
 	}
-
+	public Pessoa(Long id, String nome) {
+		this.id = id;
+		this.nome = nome;
+	}
 	public Pessoa(String nome, Igreja igreja, Cargo cargo) {
 		this.nome = nome;
 		this.igreja = igreja;

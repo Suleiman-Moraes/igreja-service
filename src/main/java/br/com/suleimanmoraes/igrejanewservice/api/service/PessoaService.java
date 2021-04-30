@@ -1,5 +1,7 @@
 package br.com.suleimanmoraes.igrejanewservice.api.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 
 import br.com.suleimanmoraes.igrejanewservice.api.dto.PessoaDto;
@@ -27,4 +29,6 @@ public interface PessoaService extends CrudPadraoService<Pessoa>{
 	Page<PessoaListagemDto> findByParams(FilterPessoaDto filter);
 
 	Boolean ativar(Long id) throws Exception;
+
+	List<Pessoa> findByIgrejaIdAndAtivo(Long igrejaId);
 }

@@ -1,5 +1,7 @@
 package br.com.suleimanmoraes.igrejanewservice.api.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +95,7 @@ public class PessoaController {
 		PessoaDto objeto = service.findDtoById();
 		return ResponseEntity.ok(objeto);
 	}
-	
+
 	@PreAuthorize("hasAuthority('ROLE_ADMIN')")
 	@DeleteMapping(value = "{id}")
 	public ResponseEntity<Boolean> deleteById(HttpServletRequest request, @PathVariable("id") long id)
@@ -106,5 +108,13 @@ public class PessoaController {
 	public ResponseEntity<Boolean> ativar(HttpServletRequest request, @PathVariable("id") long id) throws Exception {
 		Boolean retorno = service.ativar(id);
 		return ResponseEntity.ok(retorno);
+	}
+
+	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
+	@GetMapping(value = "/igreja/{igrejaId}")
+	public ResponseEntity<List<Pessoa>> findByIgrejaIdAndAtivo(HttpServletRequest request,
+			@PathVariable("igrejaId") long igrejaId) {
+		List<Pessoa> objetos = service.findByIgrejaIdAndAtivo(igrejaId);
+		return ResponseEntity.ok(objetos);
 	}
 }

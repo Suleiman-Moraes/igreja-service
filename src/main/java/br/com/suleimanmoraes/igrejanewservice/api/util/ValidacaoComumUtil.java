@@ -101,7 +101,11 @@ public abstract class ValidacaoComumUtil {
 		try {
 			if (objeto == null) {
 				erros.add(String.format("%s deve ser informad%s.", nome, fim));
-			} else if (Double.valueOf(objeto.getClass().getMethod("getId").invoke(objeto).toString()) <= 0) {
+			} 
+			else if (objeto.getClass().getMethod("getId").invoke(objeto) == null) {
+				erros.add(String.format("%s deve ser informad%s.", nome, fim));
+			}
+			else if(Double.valueOf(objeto.getClass().getMethod("getId").invoke(objeto).toString()) <= 0) {
 				erros.add(String.format("%s deve ser maior que zero.", nome));
 			}
 		} catch (NegocioException e) {

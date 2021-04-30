@@ -305,4 +305,18 @@ public class PessoaServiceImpl implements PessoaService {
 			throw e;
 		}
 	}
+	
+	@Override
+	public List<Pessoa> findByIgrejaIdAndAtivo(Long igrejaId) {
+		try {
+			if (!RolesUtil.isRoot()) {
+				igrejaId = igrejaService.findByToken().getId();
+			}
+			final List<Pessoa> pessoas = repository.findByIgrejaIdAndAtivo(igrejaId, AtivoInativoEnum.ATIVO);
+			return pessoas;
+		} catch (Exception e) {
+			logger.warn("findByIgrejaIdAndAtivo " + ExceptionUtils.getRootCauseMessage(e));
+		}
+		return null;
+	}
 }
