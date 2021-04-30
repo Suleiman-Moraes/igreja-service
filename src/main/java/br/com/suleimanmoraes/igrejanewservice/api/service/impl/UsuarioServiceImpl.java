@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -45,9 +45,6 @@ public class UsuarioServiceImpl implements UsuarioService {
 	@Autowired
 	private PermissaoService permissaoService;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
 	private Long findIdTopByPessoaIdAndIdNot(Long pessoaId, Long id) {
 		try {
 			pessoaId = pessoaId == null ? 0l : pessoaId;
@@ -61,11 +58,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
 	@Override
 	public void preSave(Usuario objeto) {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		saveUsuarioAlteracaoAndCadastro(objeto, this);
 		if (StringUtils.hasText(objeto.getSenha()) && objeto.getSenha().length() <= 30) {
-			objeto.setSenha(passwordEncoder.encode(objeto.getSenha()));
+			objeto.setSenha(encoder.encode(objeto.getSenha()));
 		} else if (objeto.getId() == null) {
-			objeto.setSenha(passwordEncoder.encode(objeto.getLogin()));
+			objeto.setSenha(encoder.encode(objeto.getLogin()));
 		} else {
 			objeto.setSenha(repository.findSenhaById(objeto.getId()));
 		}
