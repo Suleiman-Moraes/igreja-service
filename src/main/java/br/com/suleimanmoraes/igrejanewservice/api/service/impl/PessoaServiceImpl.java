@@ -158,9 +158,11 @@ public class PessoaServiceImpl implements PessoaService {
 		try {
 			if (id != null) {
 				Usuario usuario = usuarioService.findByLogin();
-				if (repository.existsByIdAndIgrejaId(id, usuario.getIgreja().getId())) {
+				if (RolesUtil.isRoot() || repository.existsByIdAndIgrejaId(id, usuario.getIgreja().getId())) {
 					return;
 				}
+			} else {
+				return;
 			}
 			throw new NaoAutorizadoException();
 		} catch (NaoAutorizadoException e) {
@@ -305,7 +307,7 @@ public class PessoaServiceImpl implements PessoaService {
 			throw e;
 		}
 	}
-	
+
 	@Override
 	public List<Pessoa> findByIgrejaIdAndAtivo(Long igrejaId) {
 		try {

@@ -34,12 +34,14 @@ public class EntradaController {
 	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
 	@PostMapping
 	public ResponseEntity<Entrada> newObject(HttpServletRequest request, @RequestBody Entrada objeto) throws Exception {
+		service.vericarIgreja(objeto.getId());
 		return RestControllerUtil.saveCompleto(getService(), objeto);
 	}
 
 	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
 	@PutMapping
 	public ResponseEntity<Entrada> update(HttpServletRequest request, @RequestBody Entrada objeto) throws Exception {
+		service.vericarIgreja(objeto.getId());
 		return RestControllerUtil.updateCompleto(getService(), objeto);
 	}
 

@@ -34,12 +34,14 @@ public class SaidaController {
 	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
 	@PostMapping
 	public ResponseEntity<Saida> newObject(HttpServletRequest request, @RequestBody Saida objeto) throws Exception {
+		service.vericarIgreja(objeto.getId());
 		return RestControllerUtil.saveCompleto(getService(), objeto);
 	}
 
 	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
 	@PutMapping
 	public ResponseEntity<Saida> update(HttpServletRequest request, @RequestBody Saida objeto) throws Exception {
+		service.vericarIgreja(objeto.getId());
 		return RestControllerUtil.updateCompleto(getService(), objeto);
 	}
 

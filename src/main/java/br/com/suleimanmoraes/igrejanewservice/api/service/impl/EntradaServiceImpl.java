@@ -16,16 +16,20 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import br.com.suleimanmoraes.igrejanewservice.api.dto.EntradaInformacaoDto;
+import br.com.suleimanmoraes.igrejanewservice.api.dto.GraficoDto;
+import br.com.suleimanmoraes.igrejanewservice.api.dto.GraficoGroupDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterEntradaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.listagem.EntradaListagemDto;
 import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
 import br.com.suleimanmoraes.igrejanewservice.api.enums.OpcaoTratarEnum;
+import br.com.suleimanmoraes.igrejanewservice.api.exception.NaoAutorizadoException;
 import br.com.suleimanmoraes.igrejanewservice.api.exception.NegocioException;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Entrada;
 import br.com.suleimanmoraes.igrejanewservice.api.model.FormaPagamento;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Igreja;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Pessoa;
 import br.com.suleimanmoraes.igrejanewservice.api.model.TipoEntrada;
+import br.com.suleimanmoraes.igrejanewservice.api.model.Usuario;
 import br.com.suleimanmoraes.igrejanewservice.api.repository.EntradaRepository;
 import br.com.suleimanmoraes.igrejanewservice.api.repository.dao.EntradaDao;
 import br.com.suleimanmoraes.igrejanewservice.api.service.EntradaService;
@@ -50,7 +54,7 @@ public class EntradaServiceImpl implements EntradaService {
 
 	@Autowired
 	private UsuarioService usuarioService;
-	
+
 	@Autowired
 	private PessoaService pessoaService;
 
@@ -154,6 +158,22 @@ public class EntradaServiceImpl implements EntradaService {
 	}
 
 	@Override
+	public GraficoDto montarGraficoAnual(Integer ano) {
+		GraficoDto grafico = new GraficoDto("Entradas", "green");
+		try {
+			final List<GraficoGroupDto> valores = dao.somaValorMensalPorAno(ano);
+			Integer[] v = new Integer[12];
+			if (!CollectionUtils.isEmpty(valores)) {
+				valores.forEach(valor -> v[valor.getMes() - 1] = valor.getValor().intValue());
+			}
+			grafico.setData(v);
+		} catch (Exception e) {
+			logger.warn("montarGraficoAnual " + ExceptionUtils.getRootCauseMessage(e));
+		}
+		return grafico;
+	}
+
+	@Override
 	public EntradaInformacaoDto getInformacao(FilterEntradaDto filter) {
 		try {
 			if (!RolesUtil.isRoot()) {
@@ -171,5 +191,26 @@ public class EntradaServiceImpl implements EntradaService {
 			logger.warn("getInformacao " + ExceptionUtils.getRootCauseMessage(e));
 		}
 		return new EntradaInformacaoDto();
+	}
+
+	@Override
+	public void vericarIgreja(Long id) {
+		try {
+			if (id != null) {
+				Usuario usuario = usuarioService.findByLogin();
+				if (RolesUtil.isRoot() || repository.existsByIdAndIgrejaId(id, usuario.getIgreja().getId())) {
+					return;
+				}
+			} else {
+				return;
+			}
+			throw new NaoAutorizadoException();
+		} catch (NaoAutorizadoException e) {
+			logger.warn("vericarMe " + ExceptionUtils.getRootCauseMessage(e));
+			throw e;
+		} catch (Exception e) {
+			logger.warn("vericarMe " + ExceptionUtils.getRootCauseMessage(e));
+			throw new NegocioException(e.getMessage(), e);
+		}
 	}
 }

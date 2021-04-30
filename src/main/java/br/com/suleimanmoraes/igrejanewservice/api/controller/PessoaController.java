@@ -41,6 +41,7 @@ public class PessoaController {
 	@PostMapping
 	public ResponseEntity<PessoaDto> newObject(HttpServletRequest request, @RequestBody PessoaDto objeto)
 			throws Exception {
+		service.vericarIgreja(objeto.getId());
 		service.validar(objeto);
 		PessoaDto objetoNovo = service.salvar(objeto);
 		return ResponseEntity.status(HttpStatus.OK).body(objetoNovo);
@@ -52,7 +53,7 @@ public class PessoaController {
 		Pessoa objetoNovo = service.saveNew(nome);
 		objetoNovo = service.tratar(objetoNovo, OpcaoTratarEnum.MOSTRAR);
 		return ResponseEntity.status(HttpStatus.OK).body(objetoNovo);
-	}
+	} 
 
 	@PreAuthorize("hasAuthority('ROLE_PESSOA')")
 	@PutMapping

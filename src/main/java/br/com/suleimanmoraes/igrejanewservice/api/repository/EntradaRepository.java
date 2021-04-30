@@ -6,4 +6,5 @@ import br.com.suleimanmoraes.igrejanewservice.api.model.Entrada;
 
 public interface EntradaRepository extends JpaRepository<Entrada, Long>{
 
+	boolean existsByIdAndIgrejaId(Long id, Long igrejaId);
 }

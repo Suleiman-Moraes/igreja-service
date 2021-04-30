@@ -6,4 +6,5 @@ import br.com.suleimanmoraes.igrejanewservice.api.model.Saida;
 
 public interface SaidaRepository extends JpaRepository<Saida, Long>{
 
+	boolean existsByIdAndIgrejaId(Long id, Long igrejaId);
 }

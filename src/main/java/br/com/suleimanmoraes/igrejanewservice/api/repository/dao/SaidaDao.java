@@ -1,6 +1,7 @@
 package br.com.suleimanmoraes.igrejanewservice.api.repository.dao;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Repository;
 
+import br.com.suleimanmoraes.igrejanewservice.api.dto.GraficoGroupDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.SaidaInformacaoDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterSaidaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.listagem.SaidaListagemDto;
@@ -72,6 +74,23 @@ public class SaidaDao {
 			logger.warn("findByFilter " + e.getMessage());
 		}
 		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<GraficoGroupDto> somaValorMensalPorAno(Integer ano) {
+		try {
+			StringBuilder sql = new StringBuilder("SELECT");
+			sql.append(" SUM(s.valor) AS valor,");
+			sql.append(" DATE_PART('MONTH', s.data_saida) AS mes");
+			sql.append(" FROM saida s");
+			sql.append(" WHERE DATE_PART('YEAR', s.data_saida) = :ano");
+			sql.append(" GROUP BY mes ORDER BY mes ASC");
+			return entityManager.createNativeQuery(sql.toString(), GraficoGroupDto.GRAFICO_GROUP_DTO_MAPPING)
+					.setParameter("ano", ano).getResultList();
+		} catch (Exception e) {
+			logger.warn("somaValorMensalPorAno " + e.getMessage());
+			return new LinkedList<>();
+		}
 	}
 
 	private Query getQueryByFilter(FilterSaidaDto filtro, String sql, String complemento, String mappingName)

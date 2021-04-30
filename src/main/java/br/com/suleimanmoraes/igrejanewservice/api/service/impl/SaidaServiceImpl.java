@@ -14,16 +14,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import br.com.suleimanmoraes.igrejanewservice.api.dto.GraficoDto;
+import br.com.suleimanmoraes.igrejanewservice.api.dto.GraficoGroupDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.SaidaInformacaoDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterSaidaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.listagem.SaidaListagemDto;
 import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
 import br.com.suleimanmoraes.igrejanewservice.api.enums.OpcaoTratarEnum;
+import br.com.suleimanmoraes.igrejanewservice.api.exception.NaoAutorizadoException;
 import br.com.suleimanmoraes.igrejanewservice.api.exception.NegocioException;
 import br.com.suleimanmoraes.igrejanewservice.api.model.FormaPagamento;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Igreja;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Saida;
 import br.com.suleimanmoraes.igrejanewservice.api.model.SaidaProgramada;
+import br.com.suleimanmoraes.igrejanewservice.api.model.Usuario;
 import br.com.suleimanmoraes.igrejanewservice.api.repository.SaidaRepository;
 import br.com.suleimanmoraes.igrejanewservice.api.repository.dao.SaidaDao;
 import br.com.suleimanmoraes.igrejanewservice.api.service.IgrejaService;
@@ -134,7 +138,7 @@ public class SaidaServiceImpl implements SaidaService {
 		}
 		return new PageImpl<>(new LinkedList<>(), pageable, 0);
 	}
-	
+
 	@Override
 	public SaidaInformacaoDto getInformacao(FilterSaidaDto filter) {
 		try {
@@ -149,5 +153,42 @@ public class SaidaServiceImpl implements SaidaService {
 			logger.warn("getInformacao " + ExceptionUtils.getRootCauseMessage(e));
 		}
 		return new SaidaInformacaoDto();
+	}
+
+	@Override
+	public void vericarIgreja(Long id) {
+		try {
+			if (id != null) {
+				Usuario usuario = usuarioService.findByLogin();
+				if (RolesUtil.isRoot() || repository.existsByIdAndIgrejaId(id, usuario.getIgreja().getId())) {
+					return;
+				}
+			} else {
+				return;
+			}
+			throw new NaoAutorizadoException();
+		} catch (NaoAutorizadoException e) {
+			logger.warn("vericarMe " + ExceptionUtils.getRootCauseMessage(e));
+			throw e;
+		} catch (Exception e) {
+			logger.warn("vericarMe " + ExceptionUtils.getRootCauseMessage(e));
+			throw new NegocioException(e.getMessage(), e);
+		}
+	}
+	
+	@Override
+	public GraficoDto montarGraficoAnual(Integer ano) {
+		GraficoDto grafico = new GraficoDto("Saídas", "red");
+		try {
+			final List<GraficoGroupDto> valores = dao.somaValorMensalPorAno(ano);
+			Integer[] v = new Integer[12];
+			if (!CollectionUtils.isEmpty(valores)) {
+				valores.forEach(valor -> v[valor.getMes() - 1] = valor.getValor().intValue());
+			}
+			grafico.setData(v);
+		} catch (Exception e) {
+			logger.warn("montarGraficoAnual " + ExceptionUtils.getRootCauseMessage(e));
+		}
+		return grafico;
 	}
 }
