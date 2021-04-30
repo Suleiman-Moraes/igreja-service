@@ -1,1 +1,1 @@
-web: java -Dserver.port=$PORT -Dspring.profiles.active=prod -jar target/igreja-new-service-0.0.1-SNAPSHOT.jar
+web: java -Dserver.port=$PORT -Dspring.profiles.active=oauth-security,prod -jar target/igreja-new-service-0.0.1-SNAPSHOT.jar
