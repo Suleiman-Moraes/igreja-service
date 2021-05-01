@@ -8,6 +8,8 @@ import javax.persistence.ConstructorResult;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.SqlResultSetMapping;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,6 +39,7 @@ public class SaidaListagemDto implements Serializable {
 
 	private Long id;
 
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", locale = "pt-BR", timezone = "America/Sao_Paulo")
 	private Date dataSaida;
 	
 	private Double valor;
