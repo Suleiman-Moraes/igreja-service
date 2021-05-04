@@ -20,4 +20,6 @@ public interface EntradaService extends CrudPadraoService<Entrada> {
 	GraficoDto montarGraficoAnual(Integer ano);
 
 	void vericarIgreja(Long id);
+
+	Entrada inserirDizimo(Long pessoaId, Double valor);
 }

@@ -31,4 +31,8 @@ public interface PessoaService extends CrudPadraoService<Pessoa>{
 	Boolean ativar(Long id) throws Exception;
 
 	List<Pessoa> findByIgrejaIdAndAtivo(Long igrejaId);
+
+	Page<PessoaListagemDto> findByFilterDizimista(FilterPessoaDto filter);
+
+	Pessoa findByIdAndIgrejaId(Long id, Long igrejaId);
 }

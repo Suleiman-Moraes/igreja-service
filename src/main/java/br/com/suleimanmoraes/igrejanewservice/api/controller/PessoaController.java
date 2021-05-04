@@ -75,7 +75,7 @@ public class PessoaController {
 		PessoaDto objetoNovo = service.salvar(objeto);
 		return ResponseEntity.status(HttpStatus.OK).body(objetoNovo);
 	}
-
+	
 	@PreAuthorize("hasAuthority('ROLE_PESSOA')")
 	@PostMapping(value = "/params")
 	public ResponseEntity<Page<PessoaListagemDto>> findByParams(HttpServletRequest request,
@@ -117,5 +117,13 @@ public class PessoaController {
 			@PathVariable("igrejaId") long igrejaId) {
 		List<Pessoa> objetos = service.findByIgrejaIdAndAtivo(igrejaId);
 		return ResponseEntity.ok(objetos);
+	}
+
+	@PreAuthorize("hasAuthority('ROLE_TESOUREIRO')")
+	@PostMapping(value = "/dizimista")
+	public ResponseEntity<Page<PessoaListagemDto>> findByFilterDizimista(HttpServletRequest request,
+			@RequestBody FilterPessoaDto filter) {
+		final Page<PessoaListagemDto> pagina = service.findByFilterDizimista(filter);
+		return ResponseEntity.ok(pagina);
 	}
 }

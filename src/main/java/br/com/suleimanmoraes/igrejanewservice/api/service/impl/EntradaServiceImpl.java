@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -74,10 +75,12 @@ public class EntradaServiceImpl implements EntradaService {
 			objeto.setTipoEntrada(null);
 		}
 		if (objeto.getPessoa() != null) {
-			if (StringUtils.hasText(objeto.getPessoa().getNome())) {
-				objeto.setPessoa(pessoaService.saveNew(objeto.getPessoa().getNome()));
-			} else if (objeto.getPessoa().getId() == null) {
-				objeto.setPessoa(null);
+			if (objeto.getPessoa().getId() == null) {
+				if (StringUtils.hasText(objeto.getPessoa().getNome())) {
+					objeto.setPessoa(pessoaService.saveNew(objeto.getPessoa().getNome()));
+				} else {
+					objeto.setPessoa(null);
+				}
 			}
 		}
 	}
@@ -212,5 +215,28 @@ public class EntradaServiceImpl implements EntradaService {
 			logger.warn("vericarMe " + ExceptionUtils.getRootCauseMessage(e));
 			throw new NegocioException(e.getMessage(), e);
 		}
+	}
+
+	@Override
+	@Transactional
+	public Entrada inserirDizimo(Long pessoaId, Double valor) {
+		try {
+			if (pessoaId > 0) {
+				ValidacaoComumUtil.validarNotNullAndMaiorZero(valor, "Valor", 'o');
+				final Long igrejaId = igrejaService.findByToken().getId();
+				final Pessoa pessoa = pessoaService.findByIdAndIgrejaId(pessoaId, igrejaId);
+				if (pessoa == null || pessoa.getId() == null) {
+					throw new NegocioException("Pessoa não encontrada.");
+				}
+				Entrada entrada = new Entrada(valor, String.format("Devolução de Dízimo do \"%s\".", pessoa.getNome()),
+						new TipoEntrada(1l), pessoa);
+				entrada = save(entrada);
+				return entrada;
+			}
+		} catch (Exception e) {
+			logger.warn("inserirDizimo " + ExceptionUtils.getRootCauseMessage(e));
+			throw new NegocioException(e.getMessage(), e);
+		}
+		return null;
 	}
 }

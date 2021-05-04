@@ -17,47 +17,51 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterDto;
-import br.com.suleimanmoraes.igrejanewservice.api.model.Permissao;
-import br.com.suleimanmoraes.igrejanewservice.api.service.PermissaoService;
+import br.com.suleimanmoraes.igrejanewservice.api.model.Menu;
+import br.com.suleimanmoraes.igrejanewservice.api.service.MenuService;
 import br.com.suleimanmoraes.igrejanewservice.api.util.RestControllerUtil;
 import lombok.Getter;
 
 @RestController
-@RequestMapping("/api/permissao")
-public class PermissaoController {
+@RequestMapping("/api/menu")
+public class MenuController {
 
 	@Getter
 	@Autowired
-	private PermissaoService service;
+	private MenuService service;
 
 	@PreAuthorize("hasAuthority('ROLE_ROOT')")
 	@PostMapping
-	public ResponseEntity<Permissao> newObject(HttpServletRequest request, @RequestBody Permissao objeto) throws Exception {
+	public ResponseEntity<Menu> newObject(HttpServletRequest request, @RequestBody Menu objeto) throws Exception {
 		return RestControllerUtil.saveCompleto(getService(), objeto);
 	}
 
 	@PreAuthorize("hasAuthority('ROLE_ROOT')")
 	@PutMapping
-	public ResponseEntity<Permissao> update(HttpServletRequest request, @RequestBody Permissao objeto) throws Exception {
+	public ResponseEntity<Menu> update(HttpServletRequest request, @RequestBody Menu objeto) throws Exception {
 		return RestControllerUtil.updateCompleto(getService(), objeto);
 	}
-	
+
 	@PreAuthorize("hasAuthority('ROLE_ROOT')")
-	@PostMapping(value = "/params")
-	public ResponseEntity<Page<?>> findByParams(HttpServletRequest request,
-			@RequestBody FilterDto filter) {
+	@PostMapping(value = "/findbyparamssingle")
+	public ResponseEntity<Page<?>> findByParams(HttpServletRequest request, @RequestBody FilterDto filter) {
 		return RestControllerUtil.findByParams(service, filter);
 	}
-	
+
 	@PreAuthorize("hasAuthority('ROLE_ROOT')")
 	@GetMapping(value = "{id}")
-	public ResponseEntity<Permissao> findById(HttpServletRequest request, @PathVariable("id") long id) {
+	public ResponseEntity<Menu> findById(HttpServletRequest request, @PathVariable("id") long id) {
 		return RestControllerUtil.findByIdCompleto(getService(), id);
 	}
 	
-	@PreAuthorize("hasAuthority('ROLE_ROOT')")
 	@GetMapping
-	public ResponseEntity<List<Permissao>> findAll(HttpServletRequest request) {
+	public ResponseEntity<List<Menu>> findAll(HttpServletRequest request) {
 		return RestControllerUtil.findAllCompleto(service);
+	}
+
+	@GetMapping(value = "/ativo")
+	public ResponseEntity<List<Menu>> findBy(HttpServletRequest request) {
+		List<Menu> listObject = service.findBy();
+		return ResponseEntity.ok(listObject);
 	}
 }

@@ -1,9 +1,8 @@
 package br.com.suleimanmoraes.igrejanewservice.api.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,18 +10,18 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import br.com.suleimanmoraes.igrejanewservice.api.converter.AtivoInativoEnumConverter;
 import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
-import br.com.suleimanmoraes.igrejanewservice.api.interfaces.IDadosAlteracao;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -35,8 +34,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "entrada")
-public class Entrada implements Serializable, IDadosAlteracao {
+@Table(name = "item_menu")
+public class ItemMenu implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -44,67 +43,40 @@ public class Entrada implements Serializable, IDadosAlteracao {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@Column(name = "data_hora_cadastro")
-	private Date dataCadastro;
-
-	@Column(name = "data_hora_alteracao")
-	private Date dataAlteracao;
-
-	@Column(name = "id_usuario_cadastro")
-	private Long idUsuarioCadastro;
-
-	@Column(name = "id_usuario_alteracao")
-	private Long idUsuarioAlteracao;
-	
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", locale = "pt-BR", timezone = "America/Sao_Paulo")
-	@Column(name = "data_entrada")
-	private Date dataEntrada;
-	
-	private Double valor;
-
 	private String nome;
 
-	private String descricao;
+	private String icon;
+
+	private String url;
 
 	@Convert(converter = AtivoInativoEnumConverter.class)
 	private AtivoInativoEnum ativo;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_tipo_entrada")
-	private TipoEntrada tipoEntrada;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_pessoa")
-	private Pessoa pessoa;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_igreja")
-	private Igreja igreja;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_forma_pagamento")
-	private FormaPagamento formaPagamento;
-	
-	public Entrada(Double valor, String nome, TipoEntrada tipoEntrada, Pessoa pessoa) {
-		this.valor = valor;
-		this.nome = nome;
-		this.tipoEntrada = tipoEntrada;
-		this.pessoa = pessoa;
+
+	@JsonIgnoreProperties({ "itemMenus" })
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_menu")
+	private Menu menu;
+
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "item_menu_permissao", joinColumns = {
+			@JoinColumn(name = "id_item_menu") }, inverseJoinColumns = { @JoinColumn(name = "id_permissao") })
+	private List<Permissao> permissoes;
+
+	public ItemMenu(Long id) {
+		this.id = id;
 	}
-	
-	@PrePersist
-	@Override
-	public void prePersist() {
-		ativo = ativo == null ? AtivoInativoEnum.ATIVO : ativo;
-		dataEntrada = dataEntrada == null ? new Date() : dataEntrada;
-		prePersistAndUpdate();
+	public ItemMenu(Long id, String nome, String icon, String url) {
+		this.id = id;
+		this.nome = nome;
+		this.icon = icon;
+		this.url = url;
 	}
 
-	@PreUpdate
-	@Override
-	public void preUpdate() {
-		prePersistAndUpdate();
+	@PrePersist
+	public void prePersist() {
+		ativo = ativo == null ? AtivoInativoEnum.ATIVO : ativo;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -113,7 +85,7 @@ public class Entrada implements Serializable, IDadosAlteracao {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Entrada other = (Entrada) obj;
+		ItemMenu other = (ItemMenu) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -121,6 +93,7 @@ public class Entrada implements Serializable, IDadosAlteracao {
 			return false;
 		return true;
 	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

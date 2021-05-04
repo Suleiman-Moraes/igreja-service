@@ -21,6 +21,7 @@ import br.com.suleimanmoraes.igrejanewservice.api.dto.PessoaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.filter.FilterPessoaDto;
 import br.com.suleimanmoraes.igrejanewservice.api.dto.listagem.PessoaListagemDto;
 import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
+import br.com.suleimanmoraes.igrejanewservice.api.enums.FiltroDizimistaEnum;
 import br.com.suleimanmoraes.igrejanewservice.api.exception.NaoAutorizadoException;
 import br.com.suleimanmoraes.igrejanewservice.api.exception.NegocioException;
 import br.com.suleimanmoraes.igrejanewservice.api.model.Cargo;
@@ -263,6 +264,25 @@ public class PessoaServiceImpl implements PessoaService {
 	}
 
 	@Override
+	public Page<PessoaListagemDto> findByFilterDizimista(FilterPessoaDto filter) {
+		final Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
+		try {
+			if (!RolesUtil.isRoot()) {
+				filter.setIgrejaId(igrejaService.findByToken().getId());
+			}
+			filter.setFiltroDizimistaEnum(filter.getFiltroDizimistaEnum() != null ? filter.getFiltroDizimistaEnum()
+					: FiltroDizimistaEnum.TODOS);
+			filter.setAtivo(AtivoInativoEnum.ATIVO);
+			final List<PessoaListagemDto> lista = dao.findByFilterDizimista(filter);
+			final Integer total = dao.countByFilter(filter);
+			return new PageImpl<>(lista, pageable, total);
+		} catch (Exception e) {
+			logger.warn("findByParams " + ExceptionUtils.getRootCauseMessage(e));
+		}
+		return new PageImpl<>(new LinkedList<>(), pageable, 0);
+	}
+
+	@Override
 	public Page<PessoaListagemDto> findByParams(FilterPessoaDto filter) {
 		final Pageable pageable = PageRequest.of(filter.getPage(), filter.getSize());
 		try {
@@ -320,5 +340,15 @@ public class PessoaServiceImpl implements PessoaService {
 			logger.warn("findByIgrejaIdAndAtivo " + ExceptionUtils.getRootCauseMessage(e));
 		}
 		return null;
+	}
+
+	@Override
+	public Pessoa findByIdAndIgrejaId(Long id, Long igrejaId) {
+		try {
+			return repository.findByIdAndIgrejaId(id, igrejaId);
+		} catch (Exception e) {
+			logger.warn("findByIdAndIgrejaId " + ExceptionUtils.getRootCauseMessage(e));
+			return null;
+		}
 	}
 }

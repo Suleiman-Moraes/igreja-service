@@ -8,10 +8,10 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
@@ -27,30 +27,28 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "permissao")
-public class Permissao implements Serializable{
+@Table(name = "menu")
+public class Menu implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+
 	private String nome;
-	
-	private String descricao;
-	
-	@JsonIgnore
-	@ManyToMany(mappedBy = "permissoes", fetch = FetchType.LAZY)
-	private List<Cargo> cargos;
-	
-	@JsonIgnore
-	@ManyToMany(mappedBy = "permissoes", fetch = FetchType.LAZY)
-	private List<Usuario> usuarios;
-	
-	@JsonIgnore
-	@ManyToMany(mappedBy = "permissoes", fetch = FetchType.LAZY)
+
+	@JsonIgnoreProperties({ "menu", "permissoes" })
+	@OneToMany(mappedBy = "menu", fetch = FetchType.EAGER)
 	private List<ItemMenu> itemMenus;
+
+	public Menu(Long id) {
+		this.id = id;
+	}
+	public Menu(Long id, String nome) {
+		this.id = id;
+		this.nome = nome;
+	}
 
 	@Override
 	public boolean equals(Object obj) {
@@ -60,7 +58,7 @@ public class Permissao implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Permissao other = (Permissao) obj;
+		Menu other = (Menu) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;

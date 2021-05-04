@@ -20,4 +20,6 @@ public interface PessoaRepository extends JpaRepository<Pessoa, Long> {
 
 	@Query(value = "SELECT new Pessoa(p.id, p.nome) FROM Pessoa p WHERE p.igreja.id = ?1 AND p.ativo = ?2 ORDER BY p.nome ASC")
 	List<Pessoa> findByIgrejaIdAndAtivo(Long igrejaId, AtivoInativoEnum ativo);
+
+	Pessoa findByIdAndIgrejaId(Long id, Long igrejaId);
 }

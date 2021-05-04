@@ -1,6 +1,7 @@
 package br.com.suleimanmoraes.igrejanewservice.api.dto.filter;
 
 import br.com.suleimanmoraes.igrejanewservice.api.enums.AtivoInativoEnum;
+import br.com.suleimanmoraes.igrejanewservice.api.enums.FiltroDizimistaEnum;
 import br.com.suleimanmoraes.igrejanewservice.api.interfaces.IFilterBasic;
 import lombok.Data;
 
@@ -21,6 +22,8 @@ public class FilterPessoaDto implements IFilterBasic {
 	private String nome;
 
 	private String cpf;
+	
+	private FiltroDizimistaEnum filtroDizimistaEnum;
 	
 	private AtivoInativoEnum ativo;
 
