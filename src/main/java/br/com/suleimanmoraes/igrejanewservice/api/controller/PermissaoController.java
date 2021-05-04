@@ -43,7 +43,7 @@ public class PermissaoController {
 	}
 	
 	@PreAuthorize("hasAuthority('ROLE_ROOT')")
-	@PostMapping(value = "/params")
+	@PostMapping(value = "/findbyparamssingle")
 	public ResponseEntity<Page<?>> findByParams(HttpServletRequest request,
 			@RequestBody FilterDto filter) {
 		return RestControllerUtil.findByParams(service, filter);

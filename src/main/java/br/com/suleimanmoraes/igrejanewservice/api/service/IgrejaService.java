@@ -6,4 +6,6 @@ import br.com.suleimanmoraes.igrejanewservice.api.model.Igreja;
 public interface IgrejaService extends CrudPadraoService<Igreja>{
 
 	Igreja findByToken();
+
+	Boolean ativar(Long id) throws Exception;
 }

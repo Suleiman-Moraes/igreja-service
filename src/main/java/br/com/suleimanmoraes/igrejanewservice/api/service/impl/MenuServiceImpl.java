@@ -56,7 +56,7 @@ public class MenuServiceImpl implements MenuService {
 		try {
 			final Long usuarioId = usuarioService.findByToken().getId();
 			Set<Menu> retorno = repository
-					.findByItemMenusAtivoAndItemMenusPermissoesUsuariosId(AtivoInativoEnum.ATIVO.getValue(), usuarioId);
+					.findByItemMenusAtivoAndItemMenusPermissoesUsuariosId(AtivoInativoEnum.ATIVO, usuarioId);
 			retorno.forEach(menu -> menu.setItemMenus(
 					itemMenuService.findByAtivoAndPermissoesUsuariosIdAndMenuId(usuarioId, menu.getId())));
 			return new LinkedList<>(retorno);

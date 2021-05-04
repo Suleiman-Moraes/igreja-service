@@ -5,4 +5,5 @@ import br.com.suleimanmoraes.igrejanewservice.api.model.FormaPagamento;
 
 public interface FormaPagamentoService extends CrudPadraoService<FormaPagamento>{
 
+	Boolean ativar(Long id) throws Exception;
 }
