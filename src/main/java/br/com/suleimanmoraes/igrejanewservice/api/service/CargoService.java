@@ -5,4 +5,5 @@ import br.com.suleimanmoraes.igrejanewservice.api.model.Cargo;
 
 public interface CargoService extends CrudPadraoService<Cargo>{
 
+	Boolean ativar(Long id) throws Exception;
 }

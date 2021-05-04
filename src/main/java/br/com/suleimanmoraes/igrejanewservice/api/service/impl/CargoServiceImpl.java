@@ -88,4 +88,30 @@ public class CargoServiceImpl implements CargoService {
 			return null;
 		}
 	}
+	
+	@Override
+	public Boolean ativar(Long id) throws Exception {
+		try {
+			Cargo objeto = findById(id);
+			objeto.setAtivo(AtivoInativoEnum.ATIVO);
+			save(objeto);
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			logger.warn("ativar " + ExceptionUtils.getRootCauseMessage(e));
+			throw e;
+		}
+	}
+
+	@Override
+	public Boolean deleteById(Long id) throws Exception {
+		try {
+			Cargo objeto = findById(id);
+			objeto.setAtivo(AtivoInativoEnum.INATIVO);
+			save(objeto);
+			return Boolean.TRUE;
+		} catch (Exception e) {
+			logger.warn("deleteById " + ExceptionUtils.getRootCauseMessage(e));
+			throw e;
+		}
+	}
 }
