@@ -22,50 +22,33 @@ public class CorsFilter implements Filter {
 
 	@Autowired
 	private ApiProperty apiProperty;
-	
-//	@Override
-//	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
-//			throws IOException, ServletException {
-//		
-//		HttpServletRequest request = (HttpServletRequest) req;
-//		HttpServletResponse response = (HttpServletResponse) resp;
-//		
-//		response.setHeader("Access-Control-Allow-Origin", apiProperty.getOriginPermitida());
-//        response.setHeader("Access-Control-Allow-Credentials", "true");
-//		
-//		if ("OPTIONS".equals(request.getMethod()) && apiProperty.getOriginPermitida().equals(request.getHeader("Origin"))) {
-//			response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
-//        	response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type, Accept");
-//        	response.setHeader("Access-Control-Max-Age", "3600");
-//			
-//			response.setStatus(HttpServletResponse.SC_OK);
-//		} else {
-//			chain.doFilter(req, resp);
-//		}
-//		
-//	}
-	
-	
+
 	@Override
-	public void doFilter(ServletRequest requeste, ServletResponse respons, FilterChain chain)
+	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
 			throws IOException, ServletException {
-		HttpServletResponse response = (HttpServletResponse) respons;
-		HttpServletRequest request = (HttpServletRequest) requeste;
-//		response.setHeader("Access-Control-Allow-Origin", "http://10.243.4.187:8082");
-		response.setHeader("Access-Control-Allow-Origin", "*");
-		response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
-		response.setHeader("Access-Control-Max-Age", "3600");
-		response.setHeader("Access-Control-Allow-Headers", 
-				"x-requested-with, authorization, Content-Type, Authorization, credential, X-XSRF-TOKEN");
-		
-		if("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+
+		HttpServletRequest request = (HttpServletRequest) req;
+		HttpServletResponse response = (HttpServletResponse) resp;
+
+		response.setHeader("Access-Control-Allow-Origin", apiProperty.getOriginPermitida());
+		response.setHeader("Access-Control-Allow-Credentials", "true");
+
+		if ("OPTIONS".equals(request.getMethod())
+				&& apiProperty.getOriginPermitida().equals(request.getHeader("Origin"))) {
+			response.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PUT, OPTIONS");
+			// response.setHeader("Access-Control-Allow-Headers", "Authorization,
+			// Content-Type, Accept");
+			response.setHeader("Access-Control-Allow-Headers",
+					"x-requested-with, authorization, Content-Type, Authorization, credential, X-XSRF-TOKEN");
+			response.setHeader("Access-Control-Max-Age", "3600");
+
 			response.setStatus(HttpServletResponse.SC_OK);
+		} else {
+			chain.doFilter(req, resp);
 		}
-		else {
-			chain.doFilter(requeste, respons);
-		}
+
 	}
-	
+
 	@Override
 	public void destroy() {
 	}
