@@ -2,6 +2,9 @@ package br.com.suleimanmoraes.igrejanewservice.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import lombok.Getter;
+import lombok.Setter;
+
 @ConfigurationProperties("igreja")
 public class ApiProperty {
 	private String originPermitida = "http://localhost:4200";
@@ -38,17 +41,13 @@ public class ApiProperty {
 		this.originPermitida = originPermitida;
 	}
 
+	@Getter
+	@Setter
 	public static class Seguranca {
 
 		private boolean enableHttps;
-
-		public boolean isEnableHttps() {
-			return enableHttps;
-		}
-
-		public void setEnableHttps(boolean enableHttps) {
-			this.enableHttps = enableHttps;
-		}
+		
+		private String host;
 	}
 
 	public static class Mail {

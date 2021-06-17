@@ -42,7 +42,6 @@ public class CorsFilter implements Filter {
 		} else {
 			chain.doFilter(req, resp);
 		}
-
 	}
 
 	@Override
